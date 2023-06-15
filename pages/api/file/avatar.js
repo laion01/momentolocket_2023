@@ -10,33 +10,32 @@ export const config = {
 };
 
 const post = async (req, res) => {
+  // console.log(req, res);
   const form = new formidable.IncomingForm();
   form.parse(req, async function (err, fields, files) {
-    try {
-      const filename = await saveFile(files.file);
+    console.log("files", files);
+    const filename = await saveFile(files.file);
 
-      let user = await Backend.getAuthenticatedUser({req, res});
-      if(user.id == fields.userId)
-      {
-        user = await db.User.findByPk(fields.userId)
-        user.avatar = filename;
-        user.save();
-      }
-      return res.status(201).send({ filename });
-    } catch (e) {
-      return res.status(400).send({ error: "upload failed" });
+    let user = await Backend.getAuthenticatedUser({req, res});
+    if(user.id == fields.userId)
+    {
+      console.log("User Found");
+      user = await db.User.findByPk(fields.userId)
+      user.avatar = filename;
+      user.save();
     }
-    
 
+    return res.status(201).send({ filename });
   });
 };
 
 const saveFile = async (file) => {
   const timestamp = (new Date()).getTime();
+  console.log("uploading file ", `/images/avatars/${file.originalFilename}_${timestamp}`);
   const data = fs.readFileSync(file.filepath);
   fs.writeFileSync(`./public/images/avatars/${timestamp}_${file.originalFilename}`, data);
   const filename = `/images/avatars/${timestamp}_${file.originalFilename}`;
-  fs.unlinkSync(file.filepath);
+  await fs.unlinkSync(file.filepath);
   return filename;
 };
 

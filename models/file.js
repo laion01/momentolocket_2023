@@ -1,8 +1,7 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
+import { Model } from "sequelize";
+
+export default (sequelize, DataTypes) => {
   class File extends Model {
     /**
      * Helper method for defining associations.
@@ -11,6 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      console.log("models list------------------------------", models);
+
       File.belongsTo(models.Product, {
         foreignKey: {
           name: 'productId',

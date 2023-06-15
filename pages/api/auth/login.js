@@ -2,12 +2,16 @@ import db from "models";
 import Backend from "backend"
 
 export default async function handler(req, res) {
+  console.log("00000", req.method)
     if (req.method === "POST") {
       let user = await Backend.getAuthenticatedUser({req, res});
       let newUser = false;
 
+      console.log("1111111")
+
       if(!user) {
         newUser = true;
+        console.log("22222")
 
         if (typeof req.body.email !== "string") {
           res.statusCode = 400
@@ -37,6 +41,7 @@ export default async function handler(req, res) {
       }
   
       let token = "";
+      console.log("1111111333")
 
       if(newUser) {
         var __token = Math.floor(1000 + Math.random() * 9000);

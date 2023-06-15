@@ -17,6 +17,16 @@ export default async function handler(req, res) {
       res.status(200).json({ product });
     } else if (req.method === "POST") {
         try {
+          const pproducts = await db.Product.findAndCountAll({
+            order: [
+              ['id', 'ASC'],
+            ],
+            include: [{
+              model: db.File
+            }, db.Color, db.Metal, db.Locket]
+          });
+
+          console.log("all products", pproducts)
             const p = await db.Product.findAndCountAll({
               where: {
                   locketId: req.body.product.locketId,
@@ -25,13 +35,14 @@ export default async function handler(req, res) {
               },
             });
 
+            console.log("products", p);
             if(p.count > 0) {
               res.statusCode = 409;
               res.json({ error: 'Product already exists' })
               return ;
             }
             
-            const product = await db.Product.build({
+            const product = db.Product.build({
                 locketId: req.body.product.locketId,
                 metalId: req.body.product.metalId,
                 colorId: req.body.product.colorId,
@@ -57,8 +68,9 @@ export default async function handler(req, res) {
             res.statusCode = 200;
             res.json({ products, new: product.id })
         } catch (e) {
+          console.log(e);
           res.statusCode = 400;
-            res.json({error: 'unable to add this chain'})
+            res.json({error: 'Unable to add this Product'})
         }
         
     } else if (req.method === "PUT") {
